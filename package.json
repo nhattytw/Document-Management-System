@@ -1,0 +1,25 @@
+{
+  "name": "document-management-system",
+  "version": "1.0.0",
+  "description": "Document management system ",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nhattytw/Document-Management-System.git"
+  },
+  "keywords": [
+    "PERN",
+    "NodeJs",
+    "ReactJs",
+    "ExpressJs",
+    "PostgreSQL"
+  ],
+  "author": "Nathnael Tesfaye Woldekidan",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nhattytw/Document-Management-System/issues"
+  },
+  "homepage": "https://github.com/nhattytw/Document-Management-System#readme"
+}
