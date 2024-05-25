@@ -60,6 +60,7 @@ const uploadDocument = async (req, res) => {
 // @access   Public
 const downloadDocument = async (req, res) => {
       const { id } = req.body
+      console.log(id)
 
       try {
             const document = await Document.findOne({
@@ -76,35 +77,13 @@ const downloadDocument = async (req, res) => {
                               messageFunction(true, 'Document not found')
                         )
             }
-            if (document.file_content instanceof Buffer) {
-                  res.setHeader('Content-Type', document.fileType)
-                  res.setHeader('Content-Length', document.file_content.length); // Optional: Set content length
 
-                  res.status(200)
+            res.set({
+                  'Content-Disposition': `attachment; filename="${document.fileName}"`,
+                  'Content-Type': document.mimeType
+            })
 
-                  // console.log(typeof document.file_content)
-                  // console.log(document.file_content.slice(0, 100).toString())
-
-                  const stream = document.file_content.createReadStream()
-
-                  stream.on('data', (chunk) => res.write(chunk))
-                  stream.on('end', () => res.end())
-
-                  stream.on('error', (error) => {
-                        console.error('Error downloading document: ', error)
-                        res
-                              .status(500)
-                              .json(
-                                    messageFunction(true, `Internal server error - ${error.message}`)
-                              )
-                  })
-            }else{
-                  console.error('Error: File is not a buffer')
-            }
-            // return res
-            //       .json(
-            //             messageFunction(false, 'Downloading...', document.file_content)
-            //       )
+            res.send(Buffer.from(document.file_content, 'base64'))
       } catch (error) {
             console.error('Error downloading document:', error)
             return res
