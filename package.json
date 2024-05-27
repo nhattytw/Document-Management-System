@@ -3,7 +3,12 @@
   "version": "1.0.0",
   "description": "Document management system ",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "concurrently \"npm run start:client\" \"npm run start:server\"",
+    "start:client": "npm --prefix client start",
+    "start:server": "npm --prefix server start",
+    "dev": "concurrently \"npm run dev:client\" \"npm run dev:server\"",
+    "dev:client": "npm --prefix client start",
+    "dev:server": "npm --prefix server dev"
   },
   "repository": {
     "type": "git",
@@ -22,5 +27,8 @@
   "bugs": {
     "url": "https://github.com/nhattytw/Document-Management-System/issues"
   },
-  "homepage": "https://github.com/nhattytw/Document-Management-System#readme"
+  "homepage": "https://github.com/nhattytw/Document-Management-System#readme",
+  "dependencies": {
+    "concurrently": "^8.2.2"
+  }
 }
