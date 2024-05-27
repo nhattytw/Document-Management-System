@@ -127,25 +127,24 @@ const Documents = () => {
                   if (response.status === 401) {
                         removeToken()
                         navigate('/signin')
-                  } else if (response.ok) {
+                  }
+                  else if (response.ok) {
                         const blob = await response.blob();
 
-                        const contentDisposition = response.headers.get('Content-Disposition');
                         const contentType = response.headers.get('Content-Type');
 
+                        const contentDisposition = response.headers.get('Content-Disposition');
+                        const filenameMatch = contentDisposition.match(/filename="?([^"]+)"?/);
                         let filename = 'document';
-                        if (contentDisposition) {
-                              const filenameMatch = contentDisposition.match(/filename="?([^"]+)"?/);
-                              if (filenameMatch && filenameMatch.length > 1) {
-                                    filename = filenameMatch[1];
-                              }
+
+                        if (filenameMatch && filenameMatch.length > 1) {
+                              filename = filenameMatch[1];
                         }
 
                         const url = window.URL.createObjectURL(blob);
                         const a = document.createElement('a');
-                        a.href = url;
 
-                        // a.download = 'document';
+                        a.href = url;
                         a.download = filename;
                         a.type = contentType;
 

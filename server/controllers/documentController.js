@@ -79,8 +79,9 @@ const downloadDocument = async (req, res) => {
 
             res.set({
                   'Content-Disposition': `attachment; filename="${document.fileName}"`,
-                  'Content-Type': document.mimetype,
-                  'Access-Control-Allow-Headers': 'Authorization, Content-Type'
+                  'Content-Type': document.fileType,
+                  'Access-Control-Allow-Headers': 'Authorization, Content-Type',
+                  'Access-Control-Expose-Headers': 'Content-Disposition, Content-Type',
             })
 
             const file_content = Buffer.from(document.file_content, 'base64')
