@@ -119,18 +119,39 @@ const Documents = () => {
                         }
                   )
 
+
+                  console.log('Content-Disposition:', response.headers.get('Content-Disposition'));
+                  console.log('Content-Type:', response.headers.get('Content-Type'));
+
+
                   if (response.status === 401) {
                         removeToken()
                         navigate('/signin')
                   } else if (response.ok) {
                         const blob = await response.blob();
+
+                        const contentDisposition = response.headers.get('Content-Disposition');
+                        const contentType = response.headers.get('Content-Type');
+
+                        let filename = 'document';
+                        if (contentDisposition) {
+                              const filenameMatch = contentDisposition.match(/filename="?([^"]+)"?/);
+                              if (filenameMatch && filenameMatch.length > 1) {
+                                    filename = filenameMatch[1];
+                              }
+                        }
+
                         const url = window.URL.createObjectURL(blob);
                         const a = document.createElement('a');
                         a.href = url;
-                        a.download = 'document';
+
+                        // a.download = 'document';
+                        a.download = filename;
+                        a.type = contentType;
+
                         document.body.appendChild(a);
                         a.click();
-                        document.body.removeChild(a); // Clean up after download
+                        document.body.removeChild(a);
                   } else {
                         console.error('Failed to download document')
                         setMessage('Failed to download document')
@@ -168,6 +189,7 @@ const Documents = () => {
                                                 <TableRow>
                                                       <TableCell>File Name</TableCell>
                                                       <TableCell>File Size</TableCell>
+                                                      <TableCell>File Type</TableCell>
                                                       <TableCell>Upload Date</TableCell>
                                                       <TableCell>Actions</TableCell>
                                                 </TableRow>
@@ -177,6 +199,7 @@ const Documents = () => {
                                                       <StyledTableRow key={document.id}>
                                                             <TableCell style={{ textAlign: 'center' }}>{document.fileName}</TableCell>
                                                             <TableCell style={{ textAlign: 'center' }}>{document.fileSize}</TableCell>
+                                                            <TableCell style={{ textAlign: 'center' }}>{document.fileType}</TableCell>
                                                             <TableCell style={{ textAlign: 'center' }}>{new Date(document.upload_date).toLocaleDateString()}</TableCell>
                                                             <TableCell style={{ textAlign: 'center' }}>
                                                                   <IconButton onClick={() => handleEditOpen(document.id)} sx={{ color: 'gray' }}>

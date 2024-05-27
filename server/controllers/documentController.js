@@ -60,7 +60,6 @@ const uploadDocument = async (req, res) => {
 // @access   Public
 const downloadDocument = async (req, res) => {
       const { id } = req.body
-      console.log(id)
 
       try {
             const document = await Document.findOne({
@@ -80,10 +79,13 @@ const downloadDocument = async (req, res) => {
 
             res.set({
                   'Content-Disposition': `attachment; filename="${document.fileName}"`,
-                  'Content-Type': document.mimeType
+                  'Content-Type': document.mimetype,
+                  'Access-Control-Allow-Headers': 'Authorization, Content-Type'
             })
 
-            res.send(Buffer.from(document.file_content, 'base64'))
+            const file_content = Buffer.from(document.file_content, 'base64')
+
+            res.send(file_content)
       } catch (error) {
             console.error('Error downloading document:', error)
             return res
@@ -136,7 +138,7 @@ const getDocuments = async (req, res) => {
       try {
             const documents = await Document.findAll({
                   where: { user_id: req.user.id },
-                  attributes: ['id', 'fileName', 'fileSize', 'fileType']
+                  attributes: ['id', 'fileName', 'fileSize', 'fileType', 'upload_date']
             })
 
             return res
