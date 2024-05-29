@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import { Container, Typography, Box, Table, TableBody, TableCell, TableHead, TableRow, IconButton, Button, Alert } from '@mui/material'
-import { Edit, Delete, GetApp } from '@mui/icons-material'
+import { Container, Typography, Box, Table, TableBody, TableCell, TableHead, TableRow, IconButton, Button, Alert, TextField, InputAdornment } from '@mui/material'
+import { Edit, Delete, GetApp, Add, Search } from '@mui/icons-material'
 import UploadModal from './UploadModal'
 import EditModal from './EditModal'
 import { styled } from '@mui/system'
@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router-dom'
 import { getToken, removeToken } from '../utils/auth'
 
 const StyledTableHead = styled(TableHead)({
-      backgroundColor: 'rgba(237, 111, 49, 0.75)',
+      backgroundColor: 'rgba(237, 111, 49, 0.85)',
       '& th': {
             color: '#ffffff',
             textAlign: 'center',
@@ -34,6 +34,7 @@ const Documents = () => {
       const [uploadOpen, setUploadOpen] = useState(false)
       const [editOpen, setEditOpen] = useState(false)
       const [documentId, setDocumentId] = useState(null)
+      const [searchTerm, setSearchTerm] = useState('')
 
       const [message, setMessage] = useState('')
       const [variant, setVariant] = useState('success')
@@ -119,11 +120,6 @@ const Documents = () => {
                         }
                   )
 
-
-                  console.log('Content-Disposition:', response.headers.get('Content-Disposition'));
-                  console.log('Content-Type:', response.headers.get('Content-Type'));
-
-
                   if (response.status === 401) {
                         removeToken()
                         navigate('/signin')
@@ -169,17 +165,78 @@ const Documents = () => {
             }
       }
 
+      const handleSearch = async () => {
+            try {
+                  const response = await fetch(
+                        base_url + '/documents/search',
+                        {
+                              method: 'POST',
+                              headers: {
+                                    'Content-Type': 'application/json',
+                                    'Authorization': `Bearer ${token}`
+                              },
+                              body: JSON.stringify({ searchTerm: searchTerm })
+                        }
+                  )
+                  const data = await response.json()
+
+                  setDocuments(data.data)
+                  setSearchTerm('')
+            } catch (error) {
+                  console.error('Failed to fetch documents', error)
+                  setMessage('Failed to fetch documents')
+                  setVariant('error')
+                  setShow(true)
+            }
+      }
+
       return (
             <Container component="main">
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 8 }}>
-                        <Typography component="h1" variant="h5">Documents</Typography>
-                        <Button variant="contained" color="primary" onClick={handleUploadOpen}>Upload Document</Button>
+                        <Button
+                              variant="contained"
+                              color="primary"
+                              startIcon={<Add />}
+                              onClick={handleUploadOpen}
+                              sx={{
+                                    backgroundColor: '#5FAE89',
+                                    color: 'white',
+                                    transition: 'background-color 0.2s ease',
+                                    '&:hover': {
+                                          backgroundColor: '#218838',
+                                    },
+                                    height: '50px',
+                              }}
+                        >
+                              Upload
+                        </Button>
+
+                        <TextField
+                              label="Search"
+                              variant="outlined"
+                              value={searchTerm}
+                              onChange={(e) => setSearchTerm(e.target.value)}
+                              // sx={{ mr: 1, height: '10px' }} // Ensure consistent height
+                              InputProps={{
+                                    endAdornment: (
+                                          <InputAdornment position="end">
+                                                <IconButton onClick={() => handleSearch()}>
+                                                      <Search />
+                                                </IconButton>
+                                          </InputAdornment>
+                                    ),
+                              }}
+                        />
                   </Box>
-                  {show && (
-                        <Alert severity={variant} sx={{ mt: 2, width: '100%' }}>
-                              {message}
-                        </Alert>
-                  )}
+
+                  {
+                        show && (
+                              <Alert severity={variant} sx={{ mt: 2, width: '100%' }}>
+                                    {message}
+                              </Alert>
+                        )
+                  }
+
                   {
                         documents.length ? (
                               <>
@@ -226,7 +283,7 @@ const Documents = () => {
                   <UploadModal open={uploadOpen} onClose={handleUploadClose} onUploadSuccess={handleUploadSuccess} />
                   <EditModal open={editOpen} onClose={handleEditClose} documentId={documentId} onEditSuccess={handleEditSuccess} />
 
-            </Container>
+            </Container >
       )
 }
 

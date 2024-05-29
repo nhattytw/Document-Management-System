@@ -1,4 +1,5 @@
 require('dotenv').config()
+const { Op } = require('sequelize')
 const Document = require('../model/document')
 const messageFunction = require('../utils/messageFunction')
 // const VirusTotalApi = require('virustotal-api')
@@ -17,7 +18,9 @@ const uploadDocument = async (req, res) => {
             if (!fileName || !file) {
                   return res
                         .status(400)
-                        .json(messageFunction(true, 'File name and file are required'))
+                        .json(
+                              messageFunction(true, 'File name and file are required')
+                        )
             }
 
             const fileSizeInBytes = file.size
@@ -139,7 +142,10 @@ const getDocuments = async (req, res) => {
       try {
             const documents = await Document.findAll({
                   where: { user_id: req.user.id },
-                  attributes: ['id', 'fileName', 'fileSize', 'fileType', 'upload_date']
+                  attributes: ['id', 'fileName', 'fileSize', 'fileType', 'upload_date'],
+                  order: [
+                        ['upload_date', 'DESC']
+                  ]
             })
 
             return res
@@ -149,6 +155,44 @@ const getDocuments = async (req, res) => {
                   )
       } catch (error) {
             console.error('Error fetching documents:', error)
+            return res
+                  .status(500)
+                  .json(
+                        messageFunction(true, `Internal server error - ${error.message}`)
+                  )
+      }
+}
+
+// @desc     Search Document(s)
+// @access   Private
+const searchDocument = async (req, res) => {
+      const { searchTerm } = req.body
+
+      console.log(searchTerm)
+
+      const regexPattern = `%${searchTerm}%`
+
+      try {
+            const documents = await Document.findAll({
+                  where: {
+                        user_id: req.user.id,
+                        fileName: {
+                              [Op.iLike]: regexPattern
+                        }
+                  },
+                  attributes: ['id', 'fileName', 'fileSize', 'fileType', 'upload_date'],
+                  order: [
+                        ['upload_date', 'DESC']
+                  ]
+            })
+
+            return res
+                  .status(200)
+                  .json(
+                        messageFunction(false, 'Search Completed Successfully', documents)
+                  )
+      } catch (error) {
+            console.error('Error searching documents:', error)
             return res
                   .status(500)
                   .json(
@@ -172,13 +216,17 @@ const editDocumentName = async (req, res) => {
             if (!document) {
                   return res
                         .status(404)
-                        .json(messageFunction(true, 'Document not found'))
+                        .json(
+                              messageFunction(true, 'Document not found')
+                        )
             }
 
             if (!newFileName) {
                   return res
                         .status(404)
-                        .json(messageFunction(true, 'New file name is required'))
+                        .json(
+                              messageFunction(true, 'New file name is required')
+                        )
             }
 
             document.fileName = newFileName
@@ -199,4 +247,4 @@ const editDocumentName = async (req, res) => {
       }
 }
 
-module.exports = { getDocuments, editDocumentName, uploadDocument, downloadDocument, deleteDocument }
+module.exports = { getDocuments, searchDocument, editDocumentName, uploadDocument, downloadDocument, deleteDocument }

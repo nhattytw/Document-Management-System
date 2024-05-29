@@ -10,13 +10,20 @@ const {
       uploadDocument,
       downloadDocument,
       deleteDocument,
-      editDocumentName } = require('../controllers/documentController')
+      editDocumentName,
+      searchDocument } = require('../controllers/documentController')
 
 router.get(
       '/',
       authMiddleware,
       getDocuments,
       fileErrorHandler
+)
+
+router.post(
+      '/search',
+      authMiddleware,
+      searchDocument
 )
 
 router.post(
