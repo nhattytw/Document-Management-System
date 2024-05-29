@@ -27,7 +27,9 @@ const Navbar = () => {
             <AppBar position="static" style={{ backgroundColor: '#ED6F31' }}>
                   <Toolbar>
                         <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-                              Document Management System
+                              <Link to="/" style={{ textDecoration: 'none', color: 'inherit' }}>
+                                    Document Management System
+                              </Link>
                         </Typography>
                         {token ? (
                               <>
