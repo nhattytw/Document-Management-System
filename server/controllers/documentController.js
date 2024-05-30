@@ -168,8 +168,6 @@ const getDocuments = async (req, res) => {
 const searchDocument = async (req, res) => {
       const { searchTerm } = req.body
 
-      console.log(searchTerm)
-
       const regexPattern = `%${searchTerm}%`
 
       try {

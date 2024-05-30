@@ -71,7 +71,12 @@ const Documents = () => {
       const handleUploadClose = () => setUploadOpen(false)
 
       const handleUploadSuccess = (newDocument) => {
-            setDocuments([...documents, newDocument])
+            const updatedDocuments = [...documents, newDocument]
+            updatedDocuments.sort((a, b) =>
+                  new Date(b.upload_date) - new Date(a.upload_date)
+            )
+
+            setDocuments(updatedDocuments)
       }
 
       const handleEditOpen = (id) => {
@@ -82,7 +87,10 @@ const Documents = () => {
       const handleEditClose = () => setEditOpen(false)
 
       const handleEditSuccess = (updatedDocument) => {
-            setDocuments(documents.map(doc => doc.id === updatedDocument.id ? updatedDocument : doc))
+            setDocuments(documents.map(
+                  doc => doc.id === updatedDocument.id ?
+                        updatedDocument : doc
+            ))
       }
 
       const handleDelete = async (id) => {
@@ -125,28 +133,28 @@ const Documents = () => {
                         navigate('/signin')
                   }
                   else if (response.ok) {
-                        const blob = await response.blob();
+                        const blob = await response.blob()
 
-                        const contentType = response.headers.get('Content-Type');
+                        const contentType = response.headers.get('Content-Type')
 
-                        const contentDisposition = response.headers.get('Content-Disposition');
-                        const filenameMatch = contentDisposition.match(/filename="?([^"]+)"?/);
-                        let filename = 'document';
+                        const contentDisposition = response.headers.get('Content-Disposition')
+                        const filenameMatch = contentDisposition.match(/filename="?([^"]+)"?/)
+                        let filename = 'document'
 
                         if (filenameMatch && filenameMatch.length > 1) {
-                              filename = filenameMatch[1];
+                              filename = filenameMatch[1]
                         }
 
-                        const url = window.URL.createObjectURL(blob);
-                        const a = document.createElement('a');
+                        const url = window.URL.createObjectURL(blob)
+                        const a = document.createElement('a')
 
-                        a.href = url;
-                        a.download = filename;
-                        a.type = contentType;
+                        a.href = url
+                        a.download = filename
+                        a.type = contentType
 
-                        document.body.appendChild(a);
-                        a.click();
-                        document.body.removeChild(a);
+                        document.body.appendChild(a)
+                        a.click()
+                        document.body.removeChild(a)
                   } else {
                         console.error('Failed to download document')
                         setMessage('Failed to download document')
@@ -210,23 +218,30 @@ const Documents = () => {
                         >
                               Upload
                         </Button>
-
-                        <TextField
-                              label="Search"
-                              variant="outlined"
-                              value={searchTerm}
-                              onChange={(e) => setSearchTerm(e.target.value)}
-                              // sx={{ mr: 1, height: '10px' }} // Ensure consistent height
-                              InputProps={{
-                                    endAdornment: (
-                                          <InputAdornment position="end">
-                                                <IconButton onClick={() => handleSearch()}>
-                                                      <Search />
-                                                </IconButton>
-                                          </InputAdornment>
-                                    ),
+                        <form
+                              onSubmit={(e) => {
+                                    e.preventDefault()
+                                    handleSearch()
                               }}
-                        />
+                        >
+
+                              <TextField
+                                    label="Search"
+                                    variant="outlined"
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    InputProps={{
+                                          endAdornment: (
+                                                <InputAdornment position="end">
+                                                      <IconButton onClick={() => handleSearch()}>
+                                                            <Search />
+                                                      </IconButton>
+                                                </InputAdornment>
+                                          ),
+                                    }}
+                              />
+                        </form>
+
                   </Box>
 
                   {
