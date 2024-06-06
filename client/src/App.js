@@ -7,6 +7,7 @@ import Register from './components/Register'
 import Documents from './components/Documents'
 import PrivateRoute from './components/PrivateRoute'
 import { getToken } from './utils/auth'
+import Settings from './components/Settings'
 
 
 function App() {
@@ -17,15 +18,10 @@ function App() {
       <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/login" element={
-          token ?
-            <Documents /> : <Login />
-        } />
-        <Route path="/register" element={
-          token ?
-            <Documents /> : <Register />
-        } />
+        <Route path="/login" element={token ? <Documents /> : <Login />} />
+        <Route path="/register" element={token ? <Documents /> : <Register />} />
         <Route path="/documents" element={<PrivateRoute><Documents /></PrivateRoute>} />
+        <Route path="/settings" element={<PrivateRoute><Settings /></PrivateRoute>} />
       </Routes>
     </Router>
   )
